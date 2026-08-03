@@ -44,6 +44,22 @@ class RepositoryContractTests(unittest.TestCase):
                 self.assertRegex(text, re.compile(r"exact .*locator", re.IGNORECASE))
                 self.assertRegex(text, re.compile(r"incomplete review coverage|coverage is incomplete|coverage is complete", re.IGNORECASE))
 
+    def test_principal_prompts_are_staged(self) -> None:
+        paths = [
+            ROOT / "appsec" / "level-3-principal-brutal-review.md",
+            ROOT / "nwpt" / "level-3-principal-brutal-review.md",
+            ROOT / "mobile" / "level-3-principal-brutal-review.md",
+        ]
+        for path in paths:
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(path=path):
+                self.assertIn("MANDATORY EXECUTION MODE", text)
+                self.assertIn("INVENTORY", text)
+                self.assertIn("FINDING_BATCH", text)
+                self.assertIn("FINALISE", text)
+                self.assertIn("No whole-report verdict issued from this batch", text)
+                self.assertIn("expected_finding_ids", text)
+
     def test_unsafe_cvss_instruction_is_absent(self) -> None:
         text = (ROOT / "nwpt" / "level-2-senior-review.md").read_text(encoding="utf-8")
         self.assertNotIn("recalculate CVSS where used", text)
