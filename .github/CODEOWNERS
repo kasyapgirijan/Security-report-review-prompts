@@ -1,0 +1,10 @@
+# Default owner
+* @kasyapgirijan
+
+# Security-sensitive contracts and schemas
+/shared/ @kasyapgirijan
+/schemas/ @kasyapgirijan
+/standards.lock.yml @kasyapgirijan
+/.github/ @kasyapgirijan
+/SECURITY.md @kasyapgirijan
+/DATA-HANDLING.md @kasyapgirijan
