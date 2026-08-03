@@ -1,0 +1,36 @@
+lockfile_version: "1.0"
+verified_on: "2026-08-03"
+
+# These versions constrain prompt-generated references. They do not require
+# historical reports to be silently remapped to the latest standard.
+standards:
+  owasp_asvs:
+    version: "5.0.0"
+    status: "verified"
+    purpose: "Application security verification requirements"
+  first_cvss:
+    version: "4.0"
+    status: "verified"
+    purpose: "Vulnerability severity scoring"
+  owasp_masvs:
+    version: "2.1.0"
+    status: "verified"
+    purpose: "Mobile application security verification controls"
+  owasp_mastg:
+    version: "2.0.0"
+    status: "verified"
+    purpose: "Mobile application security testing guidance"
+  json_schema:
+    version: "2020-12"
+    status: "verified"
+    purpose: "Structured review output validation"
+  sarif:
+    version: "2.1.0"
+    status: "verified"
+    purpose: "Static-analysis interoperability"
+
+rules:
+  - Preserve the standard version declared by the report.
+  - Never construct an identifier from model memory.
+  - Mark a mapping unverified when its identifier cannot be checked against supplied or pinned material.
+  - Do not treat a CVE, CWE, OWASP category or standard mapping as proof of environment-specific exploitability or impact.
