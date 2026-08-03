@@ -17,7 +17,9 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_standards_lock_contains_required_versions(self) -> None:
         text = (ROOT / "standards.lock.yml").read_text(encoding="utf-8")
-        for expected in ("5.0.0", "4.0", "2.1.0", "2.0.0", "2020-12", "2.1.0"):
+        for name in ("owasp_asvs", "first_cvss", "owasp_masvs", "owasp_mastg", "json_schema", "sarif"):
+            self.assertIn(name, text)
+        for expected in ("5.0.0", "4.0", "2.1.0", "2.0.0", "2020-12"):
             self.assertIn(expected, text)
         self.assertIn("Never construct an identifier", text)
 
@@ -47,7 +49,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_mobile_mapping_freshness_is_pinned(self) -> None:
         text = (ROOT / "mobile" / "level-2-senior-review.md").read_text(encoding="utf-8")
-        self.assertNotIn("use current MASVS", text.lower())
+        self.assertNotIn("use current masvs", text.lower())
         self.assertIn("standards.lock.yml", text)
         self.assertIn("Never construct", text)
 
