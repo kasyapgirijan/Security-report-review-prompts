@@ -4,7 +4,7 @@
   "title": "Security Report Review Output",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "prompt", "coverage", "findings", "report_blockers", "verdict", "mandatory_actions"],
+  "required": ["schema_version", "prompt", "run", "standards_versions", "coverage", "findings", "report_blockers", "verdict", "mandatory_actions"],
   "properties": {
     "schema_version": {"const": "1.0.0"},
     "prompt": {
@@ -16,6 +16,32 @@
         "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
         "domain": {"enum": ["appsec", "nwpt", "mobile", "shared"]},
         "level": {"enum": ["analyst", "senior", "principal", "focused"]}
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "model_provider", "model_id", "model_version", "executed_at", "temperature", "tool_access"],
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "model_provider": {"type": "string", "minLength": 1},
+        "model_id": {"type": "string", "minLength": 1},
+        "model_version": {"type": "string", "minLength": 1},
+        "executed_at": {"type": "string", "format": "date-time"},
+        "temperature": {"type": "number", "minimum": 0},
+        "tool_access": {"type": "boolean"}
+      }
+    },
+    "standards_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version", "verification_status"],
+        "properties": {
+          "version": {"type": ["string", "null"]},
+          "verification_status": {"enum": ["verified", "unverified", "not_supplied"]}
+        }
       }
     },
     "coverage": {
@@ -34,19 +60,12 @@
     "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
     "report_blockers": {"type": "array", "items": {"$ref": "#/$defs/reviewIssue"}},
     "verdict": {
-      "enum": [
-        "APPROVE",
-        "APPROVE_WITH_MANDATORY_CHANGES",
-        "REJECT",
-        "CANNOT_APPROVE_INCOMPLETE_REVIEW_COVERAGE"
-      ]
+      "enum": ["APPROVE", "APPROVE_WITH_MANDATORY_CHANGES", "REJECT", "CANNOT_APPROVE_INCOMPLETE_REVIEW_COVERAGE"]
     },
     "mandatory_actions": {"type": "array", "items": {"type": "string"}}
   },
   "$defs": {
-    "evidenceStatus": {
-      "enum": ["confirmed", "supported_inference", "unverified", "contradicted", "not_reviewable"]
-    },
+    "evidenceStatus": {"enum": ["confirmed", "supported_inference", "unverified", "contradicted", "not_reviewable"]},
     "confidence": {"enum": ["high", "medium", "low", "not_applicable"]},
     "evidenceLocator": {
       "type": "object",
