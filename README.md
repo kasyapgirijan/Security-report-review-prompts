@@ -2,15 +2,23 @@
 
 Evidence-driven prompts and assurance controls for reviewing security assessment reports before internal approval or client delivery.
 
-**Current release: `0.2.0` — research-backed hardening foundation**
+**Current release: `0.3.0` — staged, research-backed hardening foundation**
 
 These prompts are intentionally strict. They are designed to expose weak evidence, unsupported impact, inflated severity, unsafe remediation, copy-paste residue, prompt injection and findings that cannot survive a technical client challenge.
 
 They do **not** prove or disprove a vulnerability by themselves and do not replace expert validation, retesting or professional accountability.
 
-## What changed in 0.2.0
+## What changed in 0.3.0
 
-The repository is no longer only a Markdown prompt collection. It now includes:
+The Principal prompts now use mandatory staged execution:
+
+1. **INVENTORY** — creates stable finding and coverage IDs; never issues a verdict.
+2. **FINDING_BATCH** — reviews a bounded finding set; explicitly cannot approve the whole report.
+3. **FINALISE** — reconciles coverage and issues a verdict only after every expected item is reviewed.
+
+Structured output also records prompt/model/provider/version, execution settings, tool access and standards verification state for reproducibility.
+
+The wider research-backed foundation includes:
 
 - Mandatory trust-boundary and review-coverage controls
 - Evidence-bound CVSS review rules
@@ -54,7 +62,7 @@ Android, iOS and cross-platform mobile security reports.
 Controls that apply across assessment types.
 
 - `review-contract.md` — instruction/data boundary, traceability, coverage and evidence rules
-- `output-contract.md` — structured evidence states, dispositions, CVSS and coverage rules
+- `output-contract.md` — structured evidence states, dispositions, CVSS, run metadata and coverage rules
 - `executive-summary-review.md` — reconciles management claims with complete finding coverage
 - `retest-and-closure-review.md` — deterministic closure predicates
 - `meta-review-security-review-prompt.md` — audits another report-review prompt before rewrite
@@ -75,7 +83,7 @@ Controls that apply across assessment types.
 
 - **Level 1 — Analyst:** checks completeness, basic credibility, evidence, clarity and actionability before senior QA.
 - **Level 2 — Senior:** challenges technical validity, exploitability, risk consistency and root-cause remediation.
-- **Level 3 — Principal / Brutal:** performs a final adversarial quality gate with explicit evidence labels, report coverage tracking, finding dispositions and client-defensibility tests.
+- **Level 3 — Principal / Brutal:** performs a staged final adversarial quality gate with explicit evidence labels, report coverage tracking, finding dispositions and client-defensibility tests.
 
 “Brutal” means evidence-bound and difficult to fool—not hostile, theatrical or biased toward rejection.
 
@@ -86,10 +94,12 @@ Controls that apply across assessment types.
 3. **Choose the domain and review level.** Use Level 1 during author QA, Level 2 for technical peer review and Level 3 before delivery.
 4. **Use the shared contracts.** Prepend `shared/review-contract.md`; use `shared/output-contract.md` for structured or regression-tested output.
 5. **Supply context.** Include scope, assessment type, environment, tester position, build/version, roles, risk model and limitations.
-6. **Demand coverage disclosure.** For long reports, require expected/reviewed finding ledgers and batch the report without issuing premature approval.
-7. **Use pinned standards.** Preserve the report's historical standard version and do not invent or silently update identifiers.
-8. **Review the reviewer.** Use the meta-review prompt before adopting a modified prompt.
-9. **Human-validate the output.** AI review comments remain hypotheses until a qualified reviewer confirms them against evidence.
+6. **For Level 3, start with INVENTORY.** Never begin with a partial finding batch and never request a final verdict from a batch.
+7. **Demand coverage disclosure.** Require expected/reviewed finding ledgers and batch long reports without premature approval.
+8. **Use pinned standards.** Preserve the report's historical standard version and do not invent or silently update identifiers.
+9. **Record run metadata.** Model/provider/version and execution settings are part of reproducibility.
+10. **Review the reviewer.** Use the meta-review prompt before adopting a modified prompt.
+11. **Human-validate the output.** AI review comments remain hypotheses until a qualified reviewer confirms them against evidence.
 
 ## Evidence language
 
@@ -134,6 +144,7 @@ Use outcome-led titles only when the outcome is directly demonstrated and necess
 - Evidence before claims
 - Exact evidence locators before reviewer certainty
 - Complete coverage disclosure before approval
+- No whole-report verdict from a finding batch
 - Reproducibility before exploitability claims
 - Attacker model before severity
 - Root-cause remediation before compensating controls
@@ -149,7 +160,7 @@ Use outcome-led titles only when the outcome is directly demonstrated and necess
 python3 -m unittest discover -s tests -v
 ```
 
-The current tests verify the strict schema, standards lock, trust boundaries, coverage gates, evidence-locator requirements, safe CVSS language, mobile reference pinning and presence of adversarial benchmark cases.
+The current tests verify the strict schema, run metadata, standards lock, trust boundaries, coverage gates, staged Principal modes, evidence-locator requirements, safe CVSS language, mobile reference pinning and adversarial benchmark cases.
 
 ## Current limitations
 
