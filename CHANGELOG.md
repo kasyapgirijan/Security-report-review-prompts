@@ -2,6 +2,22 @@
 
 All notable changes to this repository are documented here.
 
+## [0.3.0] — 2026-08-03
+
+### Changed
+
+- Rebuilt all Principal prompts around mandatory `INVENTORY`, `FINDING_BATCH` and `FINALISE` modes
+- Prohibited whole-report verdicts from partial finding batches
+- Added stable finding/attack-path inventories and explicit set-equality coverage checks
+- Reduced monolithic Principal prompt size while preserving evidence, risk, impact, remediation and client-defensibility gates
+- Added reproducible run metadata to the structured output schema: model/provider/version, execution settings, tool access and standards verification state
+- Added pull-request template for prompt threat model, corpus, schema, privacy and validation evidence
+
+### Security
+
+- Long reports cannot be approved from a truncated or partial batch
+- Unreviewed findings, assets, platforms, builds and attack-path edges must remain explicitly unresolved
+
 ## [0.2.0] — 2026-08-03
 
 ### Added
@@ -12,6 +28,7 @@ All notable changes to this repository are documented here.
 - Security and data-handling policies
 - Prompt and schema versioning policy
 - Initial adversarial benchmark corpus and golden-assertion guidance
+- Static contract tests and read-only GitHub Actions workflow
 
 ### Changed
 
