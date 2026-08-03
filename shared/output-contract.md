@@ -7,6 +7,19 @@ OUTPUT RULES
 
 Return valid JSON only. Do not wrap JSON in Markdown. Do not add fields outside the supplied schema.
 
+RUN METADATA
+Record:
+- Prompt ID and prompt version
+- Domain and review level
+- Unique run ID
+- Model provider, model ID and model version
+- Execution date/time
+- Temperature or equivalent sampling setting
+- Whether tools or external references were available
+- Standards and versions supplied, with verification status
+
+Do not claim reproducibility when model version or run settings are unknown.
+
 Use these evidence states:
 - confirmed
 - supported_inference
