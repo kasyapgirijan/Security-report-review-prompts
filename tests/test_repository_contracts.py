@@ -12,8 +12,11 @@ class RepositoryContractTests(unittest.TestCase):
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
         self.assertFalse(schema["additionalProperties"])
-        self.assertIn("coverage", schema["required"])
-        self.assertIn("verdict", schema["required"])
+        for required in ("prompt", "run", "standards_versions", "coverage", "verdict"):
+            self.assertIn(required, schema["required"])
+        run_required = schema["properties"]["run"]["required"]
+        for required in ("model_provider", "model_id", "model_version", "executed_at", "temperature", "tool_access"):
+            self.assertIn(required, run_required)
 
     def test_standards_lock_contains_required_versions(self) -> None:
         text = (ROOT / "standards.lock.yml").read_text(encoding="utf-8")
