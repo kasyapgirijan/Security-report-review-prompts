@@ -1,12 +1,29 @@
 # Security Report Review Prompts
 
-Evidence-driven prompts for reviewing security assessment reports before internal approval or client delivery.
+Evidence-driven prompts and assurance controls for reviewing security assessment reports before internal approval or client delivery.
 
-These prompts are intentionally strict. They are designed to expose weak evidence, unsupported impact, inflated severity, unsafe remediation, copy-paste residue and findings that cannot survive a technical client challenge.
+**Current release: `0.2.0` — research-backed hardening foundation**
+
+These prompts are intentionally strict. They are designed to expose weak evidence, unsupported impact, inflated severity, unsafe remediation, copy-paste residue, prompt injection and findings that cannot survive a technical client challenge.
 
 They do **not** prove or disprove a vulnerability by themselves and do not replace expert validation, retesting or professional accountability.
 
-## Collections
+## What changed in 0.2.0
+
+The repository is no longer only a Markdown prompt collection. It now includes:
+
+- Mandatory trust-boundary and review-coverage controls
+- Evidence-bound CVSS review rules
+- Pinned standards versions
+- Strict JSON Schema 2020-12 output contract
+- Security and data-handling policies
+- Versioning and changelog
+- Initial adversarial benchmark cases and golden-assertion guidance
+- Static repository-contract tests and GitHub Actions validation
+
+See `CHANGELOG.md` and `QUALITY-REVIEW.md`.
+
+## Prompt collections
 
 ### `appsec/`
 Web, API, source-assisted, SAST, DAST and business-logic assessment reports.
@@ -36,16 +53,29 @@ Android, iOS and cross-platform mobile security reports.
 ### `shared/`
 Controls that apply across assessment types.
 
-- `review-contract.md` — prompt-injection boundary, traceability, coverage and evidence rules
-- `executive-summary-review.md` — reconciles management claims with findings
-- `retest-and-closure-review.md` — determines whether remediation evidence actually closes findings
-- `meta-review-security-review-prompt.md` — audits and rewrites another report-review prompt
+- `review-contract.md` — instruction/data boundary, traceability, coverage and evidence rules
+- `output-contract.md` — structured evidence states, dispositions, CVSS and coverage rules
+- `executive-summary-review.md` — reconciles management claims with complete finding coverage
+- `retest-and-closure-review.md` — deterministic closure predicates
+- `meta-review-security-review-prompt.md` — audits another report-review prompt before rewrite
+
+## Assurance and evaluation
+
+- `schemas/review-output.schema.json` — strict machine-readable review output
+- `standards.lock.yml` — pinned standards and reference rules
+- `corpus/cases.yml` — initial positive, negative and adversarial evaluation cases
+- `goldens/` — required/prohibited assertion guidance
+- `tests/test_repository_contracts.py` — static safety and consistency tests
+- `.github/workflows/static-validation.yml` — read-only automated validation
+- `DATA-HANDLING.md` — public-corpus and confidentiality policy
+- `SECURITY.md` — security-sensitive reporting guidance
+- `VERSIONING.md` — prompt and schema compatibility policy
 
 ## Review levels
 
 - **Level 1 — Analyst:** checks completeness, basic credibility, evidence, clarity and actionability before senior QA.
 - **Level 2 — Senior:** challenges technical validity, exploitability, risk consistency and root-cause remediation.
-- **Level 3 — Principal / Brutal:** performs a final adversarial quality gate with explicit evidence labels, report coverage tracking, finding disposition and client-defensibility tests.
+- **Level 3 — Principal / Brutal:** performs a final adversarial quality gate with explicit evidence labels, report coverage tracking, finding dispositions and client-defensibility tests.
 
 “Brutal” means evidence-bound and difficult to fool—not hostile, theatrical or biased toward rejection.
 
@@ -54,15 +84,14 @@ Controls that apply across assessment types.
 1. **Sanitize the material.** Remove or mask secrets, tokens, cookies, personal data, customer data and unnecessary internal identifiers.
 2. **Confirm approved AI handling.** Do not paste an unredacted confidential report into an AI service that is not approved for that data.
 3. **Choose the domain and review level.** Use Level 1 during author QA, Level 2 for technical peer review and Level 3 before delivery.
-4. **Add the shared contract when needed.** Prepend `shared/review-contract.md` to shorter prompts or custom prompts.
-5. **Supply context.** Include scope, assessment type, environment, tester position, build/version, roles, risk model and relevant limitations.
-6. **Demand coverage disclosure.** For long reports, require a reviewed/not-reviewed ledger and batch the report without issuing premature approval.
-7. **Review the reviewer.** Use `shared/meta-review-security-review-prompt.md` before adopting a modified prompt.
-8. **Human-validate the output.** AI review comments remain hypotheses until a qualified reviewer confirms them against the report and evidence.
+4. **Use the shared contracts.** Prepend `shared/review-contract.md`; use `shared/output-contract.md` for structured or regression-tested output.
+5. **Supply context.** Include scope, assessment type, environment, tester position, build/version, roles, risk model and limitations.
+6. **Demand coverage disclosure.** For long reports, require expected/reviewed finding ledgers and batch the report without issuing premature approval.
+7. **Use pinned standards.** Preserve the report's historical standard version and do not invent or silently update identifiers.
+8. **Review the reviewer.** Use the meta-review prompt before adopting a modified prompt.
+9. **Human-validate the output.** AI review comments remain hypotheses until a qualified reviewer confirms them against evidence.
 
 ## Evidence language
-
-The hardened prompts use calibrated evidence states:
 
 - **CONFIRMED** — directly demonstrated by supplied evidence
 - **SUPPORTED INFERENCE** — strongly implied but not directly demonstrated
@@ -70,11 +99,9 @@ The hardened prompts use calibrated evidence states:
 - **CONTRADICTED** — conflicts with supplied evidence
 - **NOT REVIEWABLE** — required material is missing or unreadable
 
-This is more defensible than arbitrary numeric confidence or an unexplained `/100` quality score.
+Evidence state and reviewer confidence are different concepts. A reviewer may have high confidence that a claim is unverified.
 
 ## Finding dispositions
-
-Principal prompts can recommend:
 
 - Accept
 - Accept with edits
@@ -85,7 +112,7 @@ Principal prompts can recommend:
 - Withdraw as unsupported or false positive
 - Not reviewable
 
-## Suggested finding-title formats
+## Finding-title formats
 
 - `<Weakness> in <Affected Component>`
 - `<Weakness> in <Parameter/Field> of <Endpoint/Function>`
@@ -111,34 +138,37 @@ Use outcome-led titles only when the outcome is directly demonstrated and necess
 - Attacker model before severity
 - Root-cause remediation before compensating controls
 - Demonstrated impact separated from credible extension and speculation
-- No invented mappings, references, vectors, product behaviour or implementation details
+- No invented mappings, references, vectors, product behavior or implementation details
 - WAF, EDR, MDM, CSP, pinning, RASP and monitoring are defence-in-depth unless they directly correct the documented root cause
 - No numeric quality score without a defined rubric
+- Symmetric concern for false acceptance and false rejection
 
-## Important limitations
+## Run static validation
 
-A language model may still:
+```bash
+python3 -m unittest discover -s tests -v
+```
 
-- Miss visual or technical evidence
-- Misinterpret framework or platform behaviour
-- Produce plausible but incorrect remediation
-- Lose context in large reports
-- Apply outdated security knowledge
-- Be manipulated by untrusted report content when guardrails are omitted
+The current tests verify the strict schema, standards lock, trust boundaries, coverage gates, evidence-locator requirements, safe CVSS language, mobile reference pinning and presence of adversarial benchmark cases.
 
-The final reviewer remains responsible for every accepted change and client-facing statement.
+## Current limitations
+
+The repository is **ready for expert-assisted use with human validation**, not autonomous report approval.
+
+Still needed for a stable `1.0.0` release:
+
+- Full synthetic evidence fixtures for the seeded cases
+- Two-reviewer human-adjudicated golden files
+- Multi-model and repeated-run evaluation harness
+- Precision/recall and critical-error thresholds
+- Long-context and multimodal benchmark cases
+- Dedicated API, SAST, DAST, cloud, Kubernetes, container, thick-client and IoT collections
+- Signed release evaluation reports
 
 ## Contributing
 
-Contributions should include:
-
-- Intended assessment type and review level
-- Threat model and evidence requirements
-- Anti-hallucination and coverage controls
-- Clear output schema
-- Residual limitations
-- No real client data, credentials or proprietary report text
+Read `CONTRIBUTING.md`, `DATA-HANDLING.md`, `VERSIONING.md` and `SECURITY.md` before submitting a prompt, schema or corpus change.
 
 ## License
 
-MIT
+MIT for prompts, schemas and tooling. Dataset licensing will be declared separately for public corpus artifacts.
