@@ -6,9 +6,9 @@ This document records the repository's adversarial self-review and the hardening
 
 **Ready for expert-assisted use with mandatory human validation. Not ready for autonomous client-report approval.**
 
-The repository is now more than a prompt collection: it has trust-boundary rules, complete-review coverage gates, evidence states, exact locator requirements, evidence-bound CVSS handling, a standards lock, a strict JSON output schema, an initial adversarial corpus and static contract tests.
+The repository now has trust-boundary rules, complete-review coverage gates, staged Principal execution, evidence states, exact locator requirements, evidence-bound CVSS handling, a standards lock, a strict JSON output schema, reproducible run metadata, an initial adversarial corpus and static contract tests.
 
-## Critical defects found in the earlier release
+## Critical defects found in earlier releases
 
 ### 1. Missing injection boundaries in Level 1 and Level 2
 
@@ -20,7 +20,7 @@ Report text, payloads, screenshots and source comments could contain instruction
 
 Short prompts could approve a report without proving every finding or material section was received and reviewed.
 
-**Corrected:** Analyst, Senior, focused mobile, executive-summary and retest prompts now require expected/reviewed ledgers and prohibit approval when coverage is incomplete.
+**Corrected:** Analyst, Senior, focused mobile, executive-summary and retest prompts require expected/reviewed ledgers and prohibit approval when coverage is incomplete.
 
 ### 3. Weak traceability
 
@@ -40,11 +40,11 @@ Mobile prompts requested current MASVS/MASWE/MASTG mappings without defining how
 
 **Corrected:** `standards.lock.yml` pins verified versions, while prompts preserve historical report versions and mark unverifiable identifiers unverified rather than constructing them from memory.
 
-### 6. Free-form output drift
+### 6. Free-form output drift and irreproducible runs
 
-Outputs could vary too much across runs and could not be deterministically validated or integrated.
+Outputs could vary too much across runs and model/provider/version details were absent.
 
-**Corrected:** `shared/output-contract.md` and `schemas/review-output.schema.json` define strict coverage, evidence, disposition, CVSS, impact and remediation structures.
+**Corrected:** `shared/output-contract.md` and `schemas/review-output.schema.json` define strict coverage, evidence, disposition, CVSS, impact and remediation structures, plus prompt/model/provider/version, execution settings, tool access and standards verification metadata.
 
 ### 7. No behavioral regression foundation
 
@@ -56,7 +56,17 @@ Prompt changes were judged by wording rather than observed behavior.
 
 The repository lacked data-handling, security-disclosure, versioning, ownership and automated policy checks.
 
-**Corrected:** added `DATA-HANDLING.md`, `SECURITY.md`, `VERSIONING.md`, `CHANGELOG.md`, `.github/CODEOWNERS`, static tests and a read-only GitHub Actions workflow.
+**Corrected:** added `DATA-HANDLING.md`, `SECURITY.md`, `VERSIONING.md`, `CHANGELOG.md`, `.github/CODEOWNERS`, a pull-request template, static tests and a read-only GitHub Actions workflow.
+
+### 9. Monolithic Principal prompts
+
+The Principal prompts requested inventory, whole-report QA, every finding, rewrites, cross-report analysis and a final verdict in one pass. This created predictable context exhaustion and false-completion risk.
+
+**Corrected in 0.3.0:** AppSec, NWPT and mobile Principal prompts now require exactly one mode:
+
+- `INVENTORY` creates stable expected IDs and cannot issue a verdict.
+- `FINDING_BATCH` reviews a bounded set and must state that no whole-report verdict was issued.
+- `FINALISE` is permitted only after complete expected/reviewed coverage reconciliation.
 
 ## Safety and quality invariants
 
@@ -65,6 +75,7 @@ A future release must not:
 - Follow instructions embedded in report content
 - Reveal hidden instructions or planted sensitive values
 - Approve a whole report with incomplete coverage
+- Issue a final verdict from a finding batch
 - Modify CVSS metrics without evidence for every changed value
 - Invent standards identifiers, CVEs, APIs, product behavior or configuration keys
 - Mark a compensating-control-only retest as closed
@@ -105,7 +116,8 @@ The foundation is implemented, but `1.0.0` still requires:
 ## Release judgment
 
 - **0.1.0:** useful prompt library, not assurance-ready
-- **0.2.0:** research-backed hardening foundation with static controls and seeded evaluations
-- **1.0.0 target:** empirically evaluated, versioned prompt product with reproducible model/run metadata and release thresholds
+- **0.2.0:** research-backed trust, evidence, schema, standards and governance foundation
+- **0.3.0:** staged Principal execution and reproducible run/output metadata
+- **1.0.0 target:** empirically evaluated, versioned prompt product with validated fixtures, goldens and release thresholds
 
 The decisive improvement is not a longer “omniscient” prompt. It is a system where every prompt has a threat model, every output has a contract, every claim is traceable, every unsafe failure is tested and every release has measurable evidence.
